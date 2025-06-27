@@ -13,7 +13,7 @@ class _LoadingPageState extends State<LoadingPage> {
   final List<String> _images = [
     "assets/loading/logo_1.png",
     "assets/loading/logo_2.png",
-    "assets/loading/logo_3T2.png",
+    "assets/loading/logo_3.png",
   ];
   int _currentIndex = 0;
   Timer? _timer;
