@@ -31,7 +31,6 @@ class _IntroPageState extends State<IntroPage> {
         done: Text('done'),
         onDone:
             () => Navigator.popAndPushNamed(context, RouteManager.loginPage),
-        globalBackgroundColor: Colors.white,
         pages: [
           pageViewgenerate('Reliable and Fast Text based chatting', "chat.png"),
           pageViewgenerate(
@@ -63,6 +62,17 @@ class _IntroPageState extends State<IntroPage> {
         bodyFlex: 1,
         bodyPadding: EdgeInsets.zero,
         imagePadding: EdgeInsets.all(10),
+        boxDecoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(0, -0.8), // near the top right
+            radius: 0.9,
+            colors: <Color>[
+              Colors.white, // yellow sun
+              tertiaryColor, // blue sky
+            ],
+            stops: <double>[0.7, 1],
+          ),
+        ),
       ),
     );
   }
