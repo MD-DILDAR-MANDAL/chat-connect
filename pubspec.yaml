@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  introduction_screen: ^3.1.17
   provider: ^6.1.5
 
 dev_dependencies:
@@ -21,3 +22,4 @@ flutter:
   assets:
    - assets/
    - assets/loading/
+   - assets/intro/

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chat_connect/routes/routes.dart';
 import 'package:flutter/material.dart';
 
 class LoadingPage extends StatefulWidget {
@@ -17,13 +18,18 @@ class _LoadingPageState extends State<LoadingPage> {
   ];
   int _currentIndex = 0;
   Timer? _timer;
-
+  var counter = 6;
   @override
   void initState() {
     super.initState();
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
         _currentIndex = (_currentIndex + 1) % _images.length;
+        counter--;
+        if (counter == 0) {
+          _timer?.cancel();
+          Navigator.popAndPushNamed(context, RouteManager.doneLoading);
+        }
       });
     });
   }
