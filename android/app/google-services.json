@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "963343311307",
+    "project_id": "cconnect-a1a23",
+    "storage_bucket": "cconnect-a1a23.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:963343311307:android:03d5f96fa4091233c1164e",
+        "android_client_info": {
+          "package_name": "com.example.chat_connect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4pw9ZkVB-Yc4OCCUlmm9CCZd1xqDywTQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
