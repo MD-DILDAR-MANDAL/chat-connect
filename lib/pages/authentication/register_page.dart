@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +14,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final _userController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formkey = GlobalKey<FormState>();
@@ -27,6 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<Auth>(context);
+    var currentUid;
 
     return Scaffold(
       appBar: AppBar(title: Text("Register")),
@@ -39,7 +42,29 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.fromLTRB(30.0, 0, 30.0, 10.0),
               child: TextFormField(
                 decoration: InputDecoration(
-                  labelText: "email",
+                  labelText: "Username",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  focusColor: secondaryColor,
+                ),
+                keyboardType: TextInputType.emailAddress,
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "username is required !";
+                  }
+                  return null;
+                },
+                controller: _userController,
+                style: TextStyle(color: primaryColor),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.fromLTRB(30.0, 0, 30.0, 10.0),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Email",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -62,7 +87,7 @@ class _RegisterPageState extends State<RegisterPage> {
               child: TextFormField(
                 obscureText: true,
                 decoration: InputDecoration(
-                  labelText: "password",
+                  labelText: "Password",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -83,16 +108,27 @@ class _RegisterPageState extends State<RegisterPage> {
 
             ElevatedButton(
               onPressed: () async {
+                FocusScope.of(context).unfocus();
                 final isValid = _formkey.currentState!.validate();
+
                 await auth
                     .handleSignUp(
                       _emailController.text,
                       _passwordController.text,
                     )
                     .then((value) {
+                      currentUid = value?.uid;
+                      FirebaseFirestore db = FirebaseFirestore.instance;
+                      Map<String, dynamic> userData = {
+                        "user": _userController.text,
+                        "email": _emailController.text,
+                      };
+
+                      db.collection("users").doc(currentUid).set(userData);
+
                       Navigator.popAndPushNamed(
                         context,
-                        RouteManager.profilePage,
+                        RouteManager.loginPage,
                       );
                     })
                     .catchError((e) => print(e));

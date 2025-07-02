@@ -1,6 +1,8 @@
 import 'package:chat_connect/models/themes.dart';
+import 'package:chat_connect/models/user_data.dart';
 import 'package:chat_connect/routes/routes.dart';
 import 'package:chat_connect/services/auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -83,16 +85,27 @@ class _LoginPageState extends State<LoginPage> {
 
             ElevatedButton(
               onPressed: () async {
+                FocusScope.of(context).unfocus();
                 final isValid = _formkey.currentState!.validate();
+
                 await auth
                     .handleSignInEmail(
                       _emailController.text,
                       _passwordController.text,
                     )
-                    .then((value) {
+                    .then((value) async {
+                      final userDoc =
+                          await FirebaseFirestore.instance
+                              .collection("users")
+                              .doc(value!.uid)
+                              .get();
+                      final userData = userDoc.data();
+                      UserData dataObject = UserData(value.uid, userData!);
+                    
                       Navigator.popAndPushNamed(
                         context,
                         RouteManager.profilePage,
+                        arguments: dataObject,
                       );
                     })
                     .catchError((e) => print(e));
@@ -101,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             TextButton(
               onPressed: () {
+                FocusScope.of(context).unfocus();
                 Navigator.popAndPushNamed(context, RouteManager.registerPage);
               },
               child: Text("Don't have an account?"),
