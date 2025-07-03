@@ -101,12 +101,17 @@ class _LoginPageState extends State<LoginPage> {
                               .get();
                       final userData = userDoc.data();
                       UserData dataObject = UserData(value.uid, userData!);
-                    
+
                       Navigator.popAndPushNamed(
                         context,
-                        RouteManager.profilePage,
+                        RouteManager.chatList,
                         arguments: dataObject,
                       );
+                      //   Navigator.popAndPushNamed(
+                      //     context,
+                      //     RouteManager.profilePage,
+                      //     arguments: dataObject,
+                      //   );
                     })
                     .catchError((e) => print(e));
               },
