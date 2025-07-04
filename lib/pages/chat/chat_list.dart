@@ -1,4 +1,5 @@
 import 'package:chat_connect/models/themes.dart';
+import 'package:chat_connect/routes/routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,12 +32,39 @@ class _ChatListState extends State<ChatList> {
             icon: Icon(Icons.add, color: primaryColor),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                RouteManager.profilePage,
+                arguments: uid,
+              );
+            },
             icon: Icon(Icons.settings, color: primaryColor),
           ),
         ],
       ),
-      body: ListView(),
+      body: StreamBuilder(
+        stream:
+            FirebaseFirestore.instance.collection('chats').doc(uid).snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Text("add someone to talk !!");
+          }
+
+          final data = snapshot.data?.data() as Map<String, dynamic>;
+          final List contacts = data['contacts'] ?? [];
+          if (contacts.isEmpty) {
+            return Text("add some people");
+          }
+          return ListView.builder(
+            itemCount: contacts.length,
+            itemBuilder: (context, index) {
+              final contacUid = contacts[index];
+              return ListTile(title: Text(contacUid));
+            },
+          );
+        },
+      ),
     );
   }
 

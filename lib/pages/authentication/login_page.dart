@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
     final auth = Provider.of<Auth>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Login")),
+      appBar: AppBar(title: Text("Login"), automaticallyImplyLeading: false),
       body: Form(
         key: _formkey,
         child: Column(

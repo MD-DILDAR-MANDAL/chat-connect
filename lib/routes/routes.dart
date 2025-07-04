@@ -41,14 +41,16 @@ class RouteManager {
 
       case registerPage:
         return MaterialPageRoute(builder: (context) => RegisterPage());
+
       case profilePage:
-        return MaterialPageRoute(
-          builder: (context) => ProfilePage(data.uid, data.userData),
-        );
+        return MaterialPageRoute(builder: (context) => ProfilePage(data));
+
       case editPage:
         return MaterialPageRoute(builder: (context) => EditPage());
+
       case chatList:
         return MaterialPageRoute(builder: (context) => ChatList(data.uid));
+
       default:
         throw FormatException('Route not found! Check routes again!');
     }
