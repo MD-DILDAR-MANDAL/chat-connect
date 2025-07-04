@@ -1,6 +1,7 @@
 import 'package:chat_connect/models/themes.dart';
 import 'package:chat_connect/routes/routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,9 +20,9 @@ class _ChatListState extends State<ChatList> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: tertiaryColor,
-        foregroundColor: primaryColor,
-        title: Text("E-chat", style: TextStyle(color: primaryColor)),
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
+        title: Text("E-chat", style: TextStyle(fontStyle: FontStyle.italic)),
 
         actions: [
           IconButton(
@@ -29,7 +30,7 @@ class _ChatListState extends State<ChatList> {
               ConnectUser(context, uid);
             },
 
-            icon: Icon(Icons.add, color: primaryColor),
+            icon: Icon(Icons.add),
           ),
           IconButton(
             onPressed: () {
@@ -39,7 +40,7 @@ class _ChatListState extends State<ChatList> {
                 arguments: uid,
               );
             },
-            icon: Icon(Icons.settings, color: primaryColor),
+            icon: Icon(Icons.settings),
           ),
         ],
       ),
@@ -51,16 +52,55 @@ class _ChatListState extends State<ChatList> {
             return Text("add someone to talk !!");
           }
 
-          final data = snapshot.data?.data() as Map<String, dynamic>;
-          final List contacts = data['contacts'] ?? [];
+          final contactData = snapshot.data?.data() as Map<String, dynamic>;
+          final List contacts = contactData['contacts'] ?? [];
           if (contacts.isEmpty) {
             return Text("add some people");
           }
           return ListView.builder(
             itemCount: contacts.length,
             itemBuilder: (context, index) {
-              final contacUid = contacts[index];
-              return ListTile(title: Text(contacUid));
+              final contactUid = contacts[index];
+
+              return FutureBuilder<DocumentSnapshot>(
+                future:
+                    FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(contactUid)
+                        .get(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return ListTile(title: Text("loading.........."));
+                  }
+                  if (!snapshot.data!.exists) {
+                    return ListTile(title: Text("loading.........."));
+                  }
+                  final queryData =
+                      snapshot.data!.data() as Map<String, dynamic>;
+                  String userName = queryData['user'] ?? contactUid;
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    child: ListTile(
+                      title: Text(
+                        userName,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      onTap: () {
+                        Map<String, dynamic> sendReceive = {
+                          "sender": uid,
+                          "receiver": contactUid,
+                        };
+
+                        Navigator.pushNamed(
+                          context,
+                          RouteManager.chatUser,
+                          arguments: sendReceive,
+                        );
+                      },
+                    ),
+                  );
+                },
+              );
             },
           );
         },
@@ -92,7 +132,7 @@ class _ChatListState extends State<ChatList> {
 
                   if (querySnapshot.docs.isNotEmpty) {
                     final doc = querySnapshot.docs.first;
-                    final data = doc.data();
+                    //      final data = doc.data();
                     ruid = doc.id;
 
                     final chatRef = db.collection("chats").doc(uid);
@@ -134,4 +174,6 @@ class _ChatListState extends State<ChatList> {
       },
     );
   }
+
+  void getUserName() {}
 }

@@ -32,110 +32,136 @@ class _RegisterPageState extends State<RegisterPage> {
     var currentUid;
 
     return Scaffold(
-      appBar: AppBar(title: Text("Register")),
-      body: Form(
-        key: _formkey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(30.0, 0, 30.0, 10.0),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: "Username",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+      appBar: AppBar(
+        title: Text(
+          "Register",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+        ),
+        foregroundColor: Colors.white,
+        backgroundColor: secondaryColor,
+        centerTitle: true,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(0.3, 0.3), // near the top right
+            radius: 1.1,
+            colors: <Color>[
+              Colors.white, // yellow sun
+              secondaryColor, // blue sky
+            ],
+            stops: <double>[0.9, 0.7],
+          ),
+        ),
+
+        child: Form(
+          key: _formkey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(30.0, 0, 30.0, 10.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: "Username",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusColor: secondaryColor,
                   ),
-                  focusColor: secondaryColor,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "username is required !";
+                    }
+                    return null;
+                  },
+                  controller: _userController,
+                  style: TextStyle(color: primaryColor),
                 ),
-                keyboardType: TextInputType.emailAddress,
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "username is required !";
-                  }
-                  return null;
-                },
-                controller: _userController,
-                style: TextStyle(color: primaryColor),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.fromLTRB(30.0, 0, 30.0, 10.0),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(30.0, 0, 30.0, 10.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: "Email",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusColor: secondaryColor,
                   ),
-                  focusColor: secondaryColor,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "email is required";
+                    }
+                    return null;
+                  },
+                  controller: _emailController,
+                  style: TextStyle(color: primaryColor),
                 ),
-                keyboardType: TextInputType.emailAddress,
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "email is required";
-                  }
-                  return null;
-                },
-                controller: _emailController,
-                style: TextStyle(color: primaryColor),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
-              child: TextFormField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: "Password",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
+                child: TextFormField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: "Password",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusColor: secondaryColor,
                   ),
-                  focusColor: secondaryColor,
+                  controller: _passwordController,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "Password is required";
+                    } else if (value.length < 8) {
+                      return "password should be at least 8 characters";
+                    }
+                    return null;
+                  },
+                  style: TextStyle(color: primaryColor),
                 ),
-                controller: _passwordController,
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Password is required";
-                  } else if (value.length < 8) {
-                    return "password should be at least 8 characters";
-                  }
-                  return null;
-                },
-                style: TextStyle(color: primaryColor),
               ),
-            ),
 
-            ElevatedButton(
-              onPressed: () async {
-                FocusScope.of(context).unfocus();
-                final isValid = _formkey.currentState!.validate();
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: secondaryColor,
+                ),
+                onPressed: () async {
+                  FocusScope.of(context).unfocus();
+                  final isValid = _formkey.currentState!.validate();
 
-                await auth
-                    .handleSignUp(
-                      _emailController.text,
-                      _passwordController.text,
-                    )
-                    .then((value) {
-                      currentUid = value?.uid;
-                      FirebaseFirestore db = FirebaseFirestore.instance;
-                      Map<String, dynamic> userData = {
-                        "user": _userController.text,
-                        "email": _emailController.text,
-                      };
+                  await auth
+                      .handleSignUp(
+                        _emailController.text,
+                        _passwordController.text,
+                      )
+                      .then((value) {
+                        currentUid = value?.uid;
+                        FirebaseFirestore db = FirebaseFirestore.instance;
+                        Map<String, dynamic> userData = {
+                          "user": _userController.text,
+                          "email": _emailController.text,
+                        };
 
-                      db.collection("users").doc(currentUid).set(userData);
+                        db.collection("users").doc(currentUid).set(userData);
 
-                      Navigator.popAndPushNamed(
-                        context,
-                        RouteManager.loginPage,
-                      );
-                    })
-                    .catchError((e) => print(e));
-              },
-              child: Text("connect", style: TextStyle(fontSize: 20)),
-            ),
-          ],
+                        Navigator.popAndPushNamed(
+                          context,
+                          RouteManager.loginPage,
+                        );
+                      })
+                      .catchError((e) => print(e));
+                },
+                child: Text("connect", style: TextStyle(fontSize: 20)),
+              ),
+            ],
+          ),
         ),
       ),
     );

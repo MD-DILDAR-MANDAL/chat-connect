@@ -1,4 +1,5 @@
 import 'package:chat_connect/pages/chat/chat_list.dart';
+import 'package:chat_connect/pages/chat/chat_user.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chat_connect/pages/authentication/login_page.dart';
@@ -18,6 +19,7 @@ class RouteManager {
   static const String profilePage = '/profilePage';
   static const String editPage = '/editPage';
   static const String chatList = '/chatList';
+  static const String chatUser = '/chatUser';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     var data;
@@ -50,6 +52,11 @@ class RouteManager {
 
       case chatList:
         return MaterialPageRoute(builder: (context) => ChatList(data.uid));
+
+      case chatUser:
+        return MaterialPageRoute(
+          builder: (context) => ChatUser(data["sender"], data["receiver"]),
+        );
 
       default:
         throw FormatException('Route not found! Check routes again!');

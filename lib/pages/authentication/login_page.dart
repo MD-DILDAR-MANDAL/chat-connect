@@ -31,100 +31,121 @@ class _LoginPageState extends State<LoginPage> {
     final auth = Provider.of<Auth>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Login"), automaticallyImplyLeading: false),
-      body: Form(
-        key: _formkey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(30.0, 0, 30.0, 10.0),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: "email",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+      appBar: AppBar(
+        title: Text(
+          "Login",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+        ),
+        backgroundColor: secondaryColor,
+        foregroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(-0.3, 0.3), // near the top right
+            radius: 1,
+            colors: <Color>[
+              Colors.white, // yellow sun
+              secondaryColor, // blue sky
+            ],
+            stops: <double>[0.9, 0.7],
+          ),
+        ),
+        child: Form(
+          key: _formkey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(30.0, 0, 30.0, 10.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: "email",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusColor: secondaryColor,
                   ),
-                  focusColor: secondaryColor,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "email is required";
+                    }
+                    return null;
+                  },
+                  controller: _emailController,
+                  style: TextStyle(color: primaryColor),
                 ),
-                keyboardType: TextInputType.emailAddress,
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "email is required";
-                  }
-                  return null;
-                },
-                controller: _emailController,
-                style: TextStyle(color: primaryColor),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
-              child: TextFormField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: "password",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
+                child: TextFormField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: "password",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusColor: secondaryColor,
                   ),
-                  focusColor: secondaryColor,
+                  controller: _passwordController,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "Password is required";
+                    } else if (value.length < 8) {
+                      return "password should be at least 8 characters";
+                    }
+                    return null;
+                  },
+                  style: TextStyle(color: primaryColor),
                 ),
-                controller: _passwordController,
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Password is required";
-                  } else if (value.length < 8) {
-                    return "password should be at least 8 characters";
-                  }
-                  return null;
-                },
-                style: TextStyle(color: primaryColor),
               ),
-            ),
 
-            ElevatedButton(
-              onPressed: () async {
-                FocusScope.of(context).unfocus();
-                final isValid = _formkey.currentState!.validate();
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: secondaryColor,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () async {
+                  FocusScope.of(context).unfocus();
+                  final isValid = _formkey.currentState!.validate();
 
-                await auth
-                    .handleSignInEmail(
-                      _emailController.text,
-                      _passwordController.text,
-                    )
-                    .then((value) async {
-                      final userDoc =
-                          await FirebaseFirestore.instance
-                              .collection("users")
-                              .doc(value!.uid)
-                              .get();
-                      final userData = userDoc.data();
-                      UserData dataObject = UserData(value.uid, userData!);
+                  await auth
+                      .handleSignInEmail(
+                        _emailController.text,
+                        _passwordController.text,
+                      )
+                      .then((value) async {
+                        final userDoc =
+                            await FirebaseFirestore.instance
+                                .collection("users")
+                                .doc(value!.uid)
+                                .get();
+                        final userData = userDoc.data();
+                        UserData dataObject = UserData(value.uid, userData!);
 
-                      Navigator.popAndPushNamed(
-                        context,
-                        RouteManager.chatList,
-                        arguments: dataObject,
-                      );
-                      //   Navigator.popAndPushNamed(
-                      //     context,
-                      //     RouteManager.profilePage,
-                      //     arguments: dataObject,
-                      //   );
-                    })
-                    .catchError((e) => print(e));
-              },
-              child: Text("Login", style: TextStyle(fontSize: 20)),
-            ),
-            TextButton(
-              onPressed: () {
-                FocusScope.of(context).unfocus();
-                Navigator.popAndPushNamed(context, RouteManager.registerPage);
-              },
-              child: Text("Don't have an account?"),
-            ),
-          ],
+                        Navigator.popAndPushNamed(
+                          context,
+                          RouteManager.chatList,
+                          arguments: dataObject,
+                        );
+                      })
+                      .catchError((e) => print(e));
+                },
+                child: Text("Login", style: TextStyle(fontSize: 20)),
+              ),
+              TextButton(
+                onPressed: () {
+                  FocusScope.of(context).unfocus();
+                  Navigator.pushNamed(context, RouteManager.registerPage);
+                },
+                child: Text("Don't have an account?"),
+              ),
+            ],
+          ),
         ),
       ),
     );

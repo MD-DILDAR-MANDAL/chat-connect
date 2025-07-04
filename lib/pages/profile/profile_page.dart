@@ -141,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       context,
                       ModalRoute.withName('/loginPage'),
                     );
-                    Navigator.popAndPushNamed(context, RouteManager.loginPage);
+                    Navigator.pushNamed(context, RouteManager.loginPage);
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
