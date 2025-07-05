@@ -58,11 +58,14 @@ class _ChatListState extends State<ChatList> {
             if (!snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
             }
+            var contactData = {};
+            if (snapshot.data!.data() != null) {
+              contactData = snapshot.data!.data() as Map<String, dynamic>;
+            }
 
-            final contactData = snapshot.data?.data() as Map<String, dynamic>;
             final List contacts = contactData['contacts'] ?? [];
             if (contacts.isEmpty) {
-              return Text("add some people");
+              return Center(child: Text("add someone to talk ..."));
             }
             return ListView.builder(
               itemCount: contacts.length,

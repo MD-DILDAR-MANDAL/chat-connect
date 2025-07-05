@@ -33,10 +33,7 @@ class _IntroPageState extends State<IntroPage> {
             () => Navigator.popAndPushNamed(context, RouteManager.loginPage),
         pages: [
           pageViewgenerate('Reliable and Fast Text based chatting', "chat.png"),
-          pageViewgenerate(
-            'Ensure Privacy with encrypted messages',
-            "security.png",
-          ),
+          pageViewgenerate('Ensure Privacy', "security.png"),
           pageViewgenerate(
             'Cross Platform compatibility',
             "cross_platform.png",

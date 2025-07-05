@@ -68,7 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.all(30.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,15 +78,17 @@ class _ProfilePageState extends State<ProfilePage> {
                             Text(
                               "Username: ",
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: 20,
                                 color: Colors.grey[700],
                               ),
                             ),
-                            Text(
-                              user,
-                              style: TextStyle(
-                                fontSize: 22,
-                                color: Colors.black,
+                            Flexible(
+                              child: Text(
+                                user,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ],
@@ -97,15 +99,17 @@ class _ProfilePageState extends State<ProfilePage> {
                             Text(
                               "Email: ",
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: 20,
                                 color: Colors.grey[700],
                               ),
                             ),
-                            Text(
-                              email,
-                              style: TextStyle(
-                                fontSize: 22,
-                                color: Colors.black,
+                            Flexible(
+                              child: Text(
+                                email,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ],
