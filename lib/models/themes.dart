@@ -7,3 +7,5 @@ Color tertiaryColor = Color(0xFF85D7FC);
 
 Color red1 = Color.fromARGB(255, 255, 236, 235);
 Color red2 = Color(0xFFFC2E52);
+
+Color greyLight = Color.fromARGB(255, 230, 227, 227);

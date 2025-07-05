@@ -18,9 +18,13 @@ class _ChatListState extends State<ChatList> {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
-        title: Text("E-chat", style: TextStyle(fontStyle: FontStyle.italic)),
+        title: Text(
+          "E-chat",
+          style: TextStyle(fontStyle: FontStyle.italic, fontSize: 30),
+        ),
 
         actions: [
           IconButton(
@@ -42,66 +46,72 @@ class _ChatListState extends State<ChatList> {
           ),
         ],
       ),
-      body: StreamBuilder(
-        stream:
-            FirebaseFirestore.instance.collection('chats').doc(uid).snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
-          }
+      body: Container(
+        color: greyLight,
+        child: StreamBuilder(
+          stream:
+              FirebaseFirestore.instance
+                  .collection('chats')
+                  .doc(uid)
+                  .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(child: CircularProgressIndicator());
+            }
 
-          final contactData = snapshot.data?.data() as Map<String, dynamic>;
-          final List contacts = contactData['contacts'] ?? [];
-          if (contacts.isEmpty) {
-            return Text("add some people");
-          }
-          return ListView.builder(
-            itemCount: contacts.length,
-            itemBuilder: (context, index) {
-              final contactUid = contacts[index];
+            final contactData = snapshot.data?.data() as Map<String, dynamic>;
+            final List contacts = contactData['contacts'] ?? [];
+            if (contacts.isEmpty) {
+              return Text("add some people");
+            }
+            return ListView.builder(
+              itemCount: contacts.length,
+              itemBuilder: (context, index) {
+                final contactUid = contacts[index];
 
-              return FutureBuilder<DocumentSnapshot>(
-                future:
-                    FirebaseFirestore.instance
-                        .collection("users")
-                        .doc(contactUid)
-                        .get(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return ListTile(title: Text("loading.........."));
-                  }
-                  if (!snapshot.data!.exists) {
-                    return ListTile(title: Text("loading.........."));
-                  }
-                  final queryData =
-                      snapshot.data!.data() as Map<String, dynamic>;
-                  String userName = queryData['user'] ?? contactUid;
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                    child: ListTile(
-                      title: Text(
-                        userName,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                return FutureBuilder<DocumentSnapshot>(
+                  future:
+                      FirebaseFirestore.instance
+                          .collection("users")
+                          .doc(contactUid)
+                          .get(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return ListTile(title: Text("loading.........."));
+                    }
+                    if (!snapshot.data!.exists) {
+                      return ListTile(title: Text("loading.........."));
+                    }
+                    final queryData =
+                        snapshot.data!.data() as Map<String, dynamic>;
+                    String userName = queryData['user'] ?? contactUid;
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                      child: ListTile(
+                        title: Text(
+                          userName,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () {
+                          Map<String, dynamic> sendReceive = {
+                            "sender": uid,
+                            "receiver": contactUid,
+                          };
+
+                          Navigator.pushNamed(
+                            context,
+                            RouteManager.chatUser,
+                            arguments: sendReceive,
+                          );
+                        },
                       ),
-                      onTap: () {
-                        Map<String, dynamic> sendReceive = {
-                          "sender": uid,
-                          "receiver": contactUid,
-                        };
-
-                        Navigator.pushNamed(
-                          context,
-                          RouteManager.chatUser,
-                          arguments: sendReceive,
-                        );
-                      },
-                    ),
-                  );
-                },
-              );
-            },
-          );
-        },
+                    );
+                  },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -114,10 +124,27 @@ class _ChatListState extends State<ChatList> {
       builder: (BuildContext context) {
         return Expanded(
           child: AlertDialog(
-            title: Text("enter email to connect with others"),
-            content: TextField(controller: emailController, autofocus: true),
+            backgroundColor: secondaryColor,
+
+            title: Text(
+              "Add email to connect :)",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: TextField(
+              controller: emailController,
+              autofocus: true,
+              style: TextStyle(color: Colors.white),
+              keyboardType: TextInputType.emailAddress,
+            ),
             actions: [
               TextButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: primaryColor,
+                ),
                 onPressed: () async {
                   FirebaseFirestore db = FirebaseFirestore.instance;
                   final userRef = db.collection("users");
@@ -152,19 +179,28 @@ class _ChatListState extends State<ChatList> {
                     await db.collection("chats").doc(ruid).update({
                       "contacts": FieldValue.arrayUnion([uid]),
                     });
-                  } else {
-                    print('no doc found');
                   }
 
                   Navigator.pop(context);
                 },
-                child: Text('add'),
+                child: Text(
+                  'add',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
+              SizedBox(width: 10),
               TextButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: primaryColor,
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('cancel'),
+                child: Text(
+                  'cancel',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
