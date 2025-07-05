@@ -51,7 +51,7 @@ class RouteManager {
         return MaterialPageRoute(builder: (context) => EditPage());
 
       case chatList:
-        return MaterialPageRoute(builder: (context) => ChatList(data.uid));
+        return MaterialPageRoute(builder: (context) => ChatList(data));
 
       case chatUser:
         return MaterialPageRoute(

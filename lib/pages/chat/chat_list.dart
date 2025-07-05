@@ -1,9 +1,7 @@
 import 'package:chat_connect/models/themes.dart';
 import 'package:chat_connect/routes/routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class ChatList extends StatefulWidget {
   const ChatList(this.id, {super.key});
@@ -49,7 +47,7 @@ class _ChatListState extends State<ChatList> {
             FirebaseFirestore.instance.collection('chats').doc(uid).snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return Text("add someone to talk !!");
+            return Center(child: CircularProgressIndicator());
           }
 
           final contactData = snapshot.data?.data() as Map<String, dynamic>;
@@ -174,6 +172,4 @@ class _ChatListState extends State<ChatList> {
       },
     );
   }
-
-  void getUserName() {}
 }

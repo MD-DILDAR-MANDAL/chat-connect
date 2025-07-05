@@ -11,24 +11,32 @@ class ChatUser extends StatefulWidget {
 }
 
 class _ChatUserState extends State<ChatUser> {
+  final db = FirebaseFirestore.instance;
+
+  var name = "--------";
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserName();
+  }
+
+  Future<void> fetchUserName() async {
+    final doc = await db.collection("users").doc(widget.receiver).get();
+    final data = doc.data() as Map<String, dynamic>;
+    setState(() {
+      name = data["user"];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final db = FirebaseFirestore.instance;
-
-    // final queryRef = db.collection("users").doc(widget.receiver);
-    // final docref = await queryRef.get();
-    // final dataQuery = docref.then((DocumentSnapshot doc) {
-    //   final data = doc.data() as Map<String, dynamic>;
-    // });
-    final name = "username";
-
     final String chatDocid =
         (widget.sender.compareTo(widget.receiver) < 0)
             ? "${widget.sender}_${widget.receiver}"
             : "${widget.receiver}_${widget.sender}";
 
     final msgController = TextEditingController();
-
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.black,

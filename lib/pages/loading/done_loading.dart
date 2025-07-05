@@ -1,6 +1,7 @@
 import "package:chat_connect/models/themes.dart";
 import "package:chat_connect/routes/routes.dart";
 import "package:flutter/material.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
 class DoneLoading extends StatefulWidget {
   const DoneLoading({super.key});
@@ -11,9 +12,36 @@ class DoneLoading extends StatefulWidget {
 }
 
 class _DoneLoadingState extends State<DoneLoading> {
+  bool isIntroDone = false;
+  bool isLogin = false;
+  String userId = "";
+
   startTimer() {
-    Future.delayed(Duration(seconds: 3), () {
-      Navigator.popAndPushNamed(context, RouteManager.introPage);
+    Future.delayed(Duration(seconds: 3), () async {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      isIntroDone = prefs.getBool('isIntroDone') ?? false;
+      isLogin = prefs.getBool('isLogin') ?? false;
+      userId = prefs.getString("userId") ?? "";
+
+      if (!isIntroDone) {
+        await prefs.setBool('isIntroDone', true);
+
+        Navigator.popAndPushNamed(context, RouteManager.introPage);
+      } else {
+        if (!isLogin) {
+          Navigator.popAndPushNamed(context, RouteManager.loginPage);
+        } else {
+          if (userId.isNotEmpty) {
+            Navigator.popAndPushNamed(
+              context,
+              RouteManager.chatList,
+              arguments: userId,
+            );
+          } else {
+            Navigator.popAndPushNamed(context, RouteManager.loginPage);
+          }
+        }
+      }
     });
   }
 

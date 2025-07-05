@@ -1,10 +1,10 @@
 import 'package:chat_connect/models/themes.dart';
-import 'package:chat_connect/models/user_data.dart';
 import 'package:chat_connect/routes/routes.dart';
 import 'package:chat_connect/services/auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({super.key});
@@ -125,12 +125,16 @@ class _LoginPageState extends State<LoginPage> {
                                 .doc(value!.uid)
                                 .get();
                         final userData = userDoc.data();
-                        UserData dataObject = UserData(value.uid, userData!);
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        await prefs.setString('userId', value.uid);
+
+                        await prefs.setBool('isLogin', true);
 
                         Navigator.popAndPushNamed(
                           context,
                           RouteManager.chatList,
-                          arguments: dataObject,
+                          arguments: value.uid,
                         );
                       })
                       .catchError((e) => print(e));
