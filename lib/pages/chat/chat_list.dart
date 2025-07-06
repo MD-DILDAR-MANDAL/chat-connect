@@ -29,7 +29,7 @@ class _ChatListState extends State<ChatList> {
         actions: [
           IconButton(
             onPressed: () {
-              ConnectUser(context, uid);
+              connectUser(context, uid);
             },
 
             icon: Icon(Icons.add),
@@ -119,94 +119,86 @@ class _ChatListState extends State<ChatList> {
     );
   }
 
-  Future<dynamic> ConnectUser(BuildContext context, String uid) {
+  Future<dynamic> connectUser(BuildContext context, String uid) async {
     final emailController = TextEditingController();
 
     return showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Expanded(
-          child: AlertDialog(
-            backgroundColor: secondaryColor,
+        return AlertDialog(
+          backgroundColor: secondaryColor,
 
-            title: Text(
-              "Add email to connect :)",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            content: TextField(
-              controller: emailController,
-              autofocus: true,
-              style: TextStyle(color: Colors.white),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            actions: [
-              TextButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: primaryColor,
-                ),
-                onPressed: () async {
-                  FirebaseFirestore db = FirebaseFirestore.instance;
-                  final userRef = db.collection("users");
-                  final querySnapshot =
-                      await userRef
-                          .where("email", isEqualTo: emailController.text)
-                          .get();
-
-                  final String ruid;
-
-                  if (querySnapshot.docs.isNotEmpty) {
-                    final doc = querySnapshot.docs.first;
-                    //      final data = doc.data();
-                    ruid = doc.id;
-
-                    final chatRef = db.collection("chats").doc(uid);
-                    final chatSnapshots = await chatRef.get();
-
-                    if (!chatSnapshots.exists) {
-                      await chatRef.set({"contacts": []});
-                    }
-                    db.collection("chats").doc(uid).update({
-                      "contacts": FieldValue.arrayUnion([ruid]),
-                    });
-
-                    final rchatRef = db.collection("chats").doc(ruid);
-                    final rchatSnapshots = await rchatRef.get();
-
-                    if (!rchatSnapshots.exists) {
-                      await rchatRef.set({"contacts": []});
-                    }
-                    await db.collection("chats").doc(ruid).update({
-                      "contacts": FieldValue.arrayUnion([uid]),
-                    });
-                  }
-
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'add',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(width: 10),
-              TextButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: primaryColor,
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'cancel',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
+          title: Text(
+            "Add email to connect :)",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
+          content: TextField(
+            controller: emailController,
+            autofocus: true,
+            style: TextStyle(color: Colors.white),
+            keyboardType: TextInputType.emailAddress,
+          ),
+          actions: [
+            TextButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: primaryColor,
+              ),
+              onPressed: () async {
+                FirebaseFirestore db = FirebaseFirestore.instance;
+                final userRef = db.collection("users");
+                final querySnapshot =
+                    await userRef
+                        .where("email", isEqualTo: emailController.text)
+                        .get();
+
+                final String ruid;
+
+                if (querySnapshot.docs.isNotEmpty) {
+                  final doc = querySnapshot.docs.first;
+                  //      final data = doc.data();
+                  ruid = doc.id;
+
+                  final chatRef = db.collection("chats").doc(uid);
+                  final chatSnapshots = await chatRef.get();
+
+                  if (!chatSnapshots.exists) {
+                    await chatRef.set({"contacts": []});
+                  }
+                  db.collection("chats").doc(uid).update({
+                    "contacts": FieldValue.arrayUnion([ruid]),
+                  });
+
+                  final rchatRef = db.collection("chats").doc(ruid);
+                  final rchatSnapshots = await rchatRef.get();
+
+                  if (!rchatSnapshots.exists) {
+                    await rchatRef.set({"contacts": []});
+                  }
+                  await db.collection("chats").doc(ruid).update({
+                    "contacts": FieldValue.arrayUnion([uid]),
+                  });
+                }
+
+                Navigator.pop(context);
+              },
+              child: Text('add', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            SizedBox(width: 10),
+            TextButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: primaryColor,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                'cancel',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
         );
       },
     );
