@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +19,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formkey = GlobalKey<FormState>();
-
+  bool isLoading = false;
   @override
   void dispose() {
     super.dispose();
@@ -127,39 +128,72 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
 
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: secondaryColor,
-                ),
-                onPressed: () async {
-                  FocusScope.of(context).unfocus();
-                  final isValid = _formkey.currentState!.validate();
+              isLoading
+                  ? CircularProgressIndicator()
+                  : ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: secondaryColor,
+                    ),
+                    onPressed: () async {
+                      FocusScope.of(context).unfocus();
+                      setState(() {
+                        isLoading = true;
+                      });
+                      final isValid = _formkey.currentState!.validate();
 
-                  await auth
-                      .handleSignUp(
-                        _emailController.text,
-                        _passwordController.text,
-                      )
-                      .then((value) {
+                      try {
+                        final value = await auth.handleSignUp(
+                          _emailController.text,
+                          _passwordController.text,
+                        );
                         currentUid = value?.uid;
                         FirebaseFirestore db = FirebaseFirestore.instance;
+
                         Map<String, dynamic> userData = {
                           "user": _userController.text,
                           "email": _emailController.text,
                         };
 
                         db.collection("users").doc(currentUid).set(userData);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("registration successfull"),
+                            backgroundColor: secondaryColor,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
 
                         Navigator.popAndPushNamed(
                           context,
                           RouteManager.loginPage,
                         );
-                      })
-                      .catchError((e) => print(e));
-                },
-                child: Text("connect", style: TextStyle(fontSize: 20)),
-              ),
+                      } on FirebaseAuthException catch (e) {
+                        String msg = "registration failed";
+                        if (e.code == 'email-already-in-use') {
+                          msg = "Email is already in use";
+                        } else if (e.code == 'invalid-email') {
+                          msg = "Invalid email format";
+                        } else {
+                          msg = e.message ?? msg;
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(msg),
+                            backgroundColor: red2,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+                      }
+                    },
+                    child: Text("connect", style: TextStyle(fontSize: 20)),
+                  ),
             ],
           ),
         ),

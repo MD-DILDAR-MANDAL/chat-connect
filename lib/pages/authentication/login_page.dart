@@ -2,6 +2,7 @@ import 'package:chat_connect/models/themes.dart';
 import 'package:chat_connect/routes/routes.dart';
 import 'package:chat_connect/services/auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formkey = GlobalKey<FormState>();
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -104,21 +106,25 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
 
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: secondaryColor,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () async {
-                  FocusScope.of(context).unfocus();
-                  final isValid = _formkey.currentState!.validate();
+              isLoading
+                  ? CircularProgressIndicator()
+                  : ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: secondaryColor,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () async {
+                      FocusScope.of(context).unfocus();
+                      final isValid = _formkey.currentState!.validate();
+                      setState(() {
+                        isLoading = true;
+                      });
 
-                  await auth
-                      .handleSignInEmail(
-                        _emailController.text,
-                        _passwordController.text,
-                      )
-                      .then((value) async {
+                      try {
+                        final value = await auth.handleSignInEmail(
+                          _emailController.text,
+                          _passwordController.text,
+                        );
                         final userDoc =
                             await FirebaseFirestore.instance
                                 .collection("users")
@@ -136,11 +142,33 @@ class _LoginPageState extends State<LoginPage> {
                           RouteManager.chatList,
                           arguments: value.uid,
                         );
-                      })
-                      .catchError((e) => print(e));
-                },
-                child: Text("Login", style: TextStyle(fontSize: 20)),
-              ),
+                      } on FirebaseAuthException catch (e) {
+                        String msg = "Login Failed";
+
+                        if (e.code == 'user-not-found') {
+                          msg = "user not registered";
+                        } else if (e.code == 'wrong-password') {
+                          msg = "email or password is incorrect";
+                        } else {
+                          msg = e.message ?? msg;
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(msg),
+                            backgroundColor: red2,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+                      }
+                    },
+                    child: Text("Login", style: TextStyle(fontSize: 20)),
+                  ),
               TextButton(
                 onPressed: () {
                   FocusScope.of(context).unfocus();

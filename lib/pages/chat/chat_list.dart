@@ -127,7 +127,6 @@ class _ChatListState extends State<ChatList> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: secondaryColor,
-
           title: Text(
             "Add email to connect :)",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
