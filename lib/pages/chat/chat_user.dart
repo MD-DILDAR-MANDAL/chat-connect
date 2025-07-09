@@ -184,7 +184,7 @@ class _ChatUserState extends State<ChatUser> {
                                 .doc(chatDocid)
                                 .collection("msgDetail")
                                 .add({
-                                  "content": msgController.text,
+                                  "content": msgController.text.trim(),
                                   "fromid": widget.sender,
                                   "time": FieldValue.serverTimestamp(),
                                   "toid": widget.receiver,

@@ -159,6 +159,14 @@ class _LoginPageState extends State<LoginPage> {
                             behavior: SnackBarBehavior.floating,
                           ),
                         );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(e.toString()),
+                            backgroundColor: red2,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
                       } finally {
                         if (mounted) {
                           setState(() {

@@ -20,6 +20,12 @@ class Auth {
       email: email,
       password: password,
     );
+    if (result.user != null && !result.user!.emailVerified) {
+      result.user?.sendEmailVerification();
+      throw Exception(
+        "Email not verified. Please check your inbox or spam for the verification mail",
+      );
+    }
     return _firebaseUser(result.user);
   }
 
@@ -28,6 +34,9 @@ class Auth {
       email: email,
       password: password,
     );
+    if (result.user != null) {
+      await result.user!.sendEmailVerification();
+    }
     return _firebaseUser(result.user);
   }
 

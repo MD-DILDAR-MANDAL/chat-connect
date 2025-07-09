@@ -158,7 +158,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         db.collection("users").doc(currentUid).set(userData);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text("registration successfull"),
+                            content: Text(
+                              "verification mail sent! check inbox or spam",
+                            ),
                             backgroundColor: secondaryColor,
                             behavior: SnackBarBehavior.floating,
                           ),
