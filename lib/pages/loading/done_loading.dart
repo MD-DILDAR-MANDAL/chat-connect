@@ -1,6 +1,9 @@
 import "package:chat_connect/models/themes.dart";
 import "package:chat_connect/routes/routes.dart";
+import "package:chat_connect/services/auth.dart";
+import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
+import "package:provider/provider.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 class DoneLoading extends StatefulWidget {
@@ -20,8 +23,10 @@ class _DoneLoadingState extends State<DoneLoading> {
     Future.delayed(Duration(seconds: 3), () async {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       isIntroDone = prefs.getBool('isIntroDone') ?? false;
-      isLogin = prefs.getBool('isLogin') ?? false;
-      userId = prefs.getString("userId") ?? "";
+
+      final userCheck = FirebaseAuth.instance.currentUser;
+      isLogin = userCheck == null ? false : true;
+      userId = userCheck?.uid.toString() ?? "";
 
       if (!isIntroDone) {
         await prefs.setBool('isIntroDone', true);
